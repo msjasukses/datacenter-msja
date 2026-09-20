@@ -98,6 +98,19 @@ class GuruMapelController extends Controller
         return back()->with('success', 'Data dihapus.');
     }
 
+    public function bulkDestroy(Request $r)
+    {
+        $data = $r->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:guru_mapel,id',
+        ]);
+
+        $count = GuruMapel::whereIn('id', $data['ids'])->count();
+        GuruMapel::whereIn('id', $data['ids'])->delete();
+
+        return back()->with('success', "{$count} data guru mapel dihapus.");
+    }
+
     /* ===================== IMPORT / EXPORT ===================== */
 
     public function importForm()
@@ -116,8 +129,9 @@ class GuruMapelController extends Controller
         $result = $svc->import($r->file('file'));
 
         return redirect()->route('guru-mapel.import.form')
-            ->with('success', "Import selesai: {$result->success} sukses, {$result->failed} gagal.")
-            ->with('importErrors', $result->errors);
+            ->with('success', "Import selesai: {$result->success} pembelajaran tersimpan, {$result->failed} gagal.")
+            ->with('importErrors', $result->errors)
+            ->with('importNotes', $result->notes);
     }
 
     public function importTemplate(GuruMapelExcelService $svc)

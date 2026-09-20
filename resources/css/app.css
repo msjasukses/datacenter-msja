@@ -8,6 +8,7 @@
 @import '@fontsource/inter/500.css';
 @import '@fontsource/inter/600.css';
 @import '@fontsource/inter/700.css';
+@import 'tom-select/dist/css/tom-select.css';
 
 @tailwind base;
 @tailwind components;
@@ -104,20 +105,22 @@
     .table-modern tbody tr { transition: background-color .15s; }
     .table-modern tbody tr:hover { @apply bg-brand-50/50; }
 
-    /* ===== Sidebar (teal pekat #115e59, teks putih #ffffff) ===== */
+    /* ===== Sidebar (navy #16233a, sama seperti aplikasi ujian) ===== */
     .sidebar-link {
-        @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white
-               hover:bg-white/15 hover:text-white transition relative;
+        @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#c8d3e4]
+               hover:bg-[#22334f] hover:text-white transition relative;
     }
     .sidebar-link.active {
-        @apply text-white font-semibold bg-white/20;
-        box-shadow: inset 3px 0 0 rgba(255,255,255,0.9);
+        @apply text-white font-semibold bg-[#22334f];
+        box-shadow: inset 3px 0 0 #4dabf7;
     }
-    .sidebar-link.active::after {
-        content: ''; @apply absolute right-3 w-1.5 h-1.5 rounded-full bg-white;
+    .sidebar-toggle { @apply text-left; }
+    .sidebar-sub {
+        @apply ml-5 pl-3 my-1 border-l border-[#22334f] space-y-0.5;
     }
+    .sidebar-sub .sidebar-link { @apply py-2 text-[13px]; }
     .sidebar-section {
-        @apply text-[10px] font-bold uppercase tracking-[0.12em] text-white px-3 mt-6 mb-2;
+        @apply text-[10px] font-bold uppercase tracking-[0.12em] text-[#7186a5] px-3 mt-6 mb-2;
     }
 
     /* ===== Toast (Alpine) ===== */
@@ -173,4 +176,115 @@
     width: 200px; height: 200px;
     background: radial-gradient(circle, rgba(20,184,166,0.10), transparent 60%);
     pointer-events: none;
+}
+
+/* ===== Tom Select — disamakan dengan gaya .input / .select ===== */
+.ts-wrapper {
+    @apply block w-full;
+}
+/* Tom Select menyalin class <select> ke wrapper-nya, sehingga .select/.input
+   ikut terbawa (border, shadow, dan pr-10 yang menggencet kotak kontrol).
+   Netralkan di wrapper — semua gaya visual dipegang .ts-control. */
+.ts-wrapper.select,
+.ts-wrapper.input {
+    @apply p-0 bg-transparent rounded-none shadow-none;
+    border: 0;
+}
+
+/* Kotak kontrol: meniru .input (rounded-xl, border slate, shadow-sm) */
+.ts-wrapper .ts-control {
+    @apply rounded-xl border border-slate-200 bg-white text-sm shadow-sm px-3 py-2 transition;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 2.375rem;   /* samakan dengan tinggi .input */
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+.ts-wrapper .ts-control > input {
+    @apply text-sm text-ink-800;
+}
+.ts-wrapper .ts-control > input::placeholder,
+.ts-wrapper .ts-control .item.placeholder {
+    @apply text-ink-500;
+}
+.ts-wrapper:not(.disabled) .ts-control:hover {
+    @apply border-slate-300;
+}
+.ts-wrapper.focus .ts-control,
+.ts-wrapper.dropdown-active .ts-control {
+    @apply border-brand-500 ring-2 ring-brand-100;
+    box-shadow: none;
+}
+.ts-wrapper.disabled .ts-control {
+    @apply bg-slate-50 text-ink-500 cursor-not-allowed opacity-100;
+}
+.ts-wrapper.single .ts-control,
+.ts-wrapper.single .ts-control input {
+    @apply cursor-pointer;
+}
+
+/* Panah dropdown sendiri (bawaan .select pakai background-image milik browser) */
+.ts-wrapper.single .ts-control::after {
+    content: '';
+    @apply absolute right-3 top-1/2 w-2 h-2 border-r-2 border-b-2 border-ink-500 pointer-events-none;
+    transform: translateY(-70%) rotate(45deg);
+}
+.ts-wrapper.single.dropdown-active .ts-control::after {
+    transform: translateY(-20%) rotate(-135deg);
+}
+.ts-wrapper.single .ts-control { @apply relative pr-9; }
+.ts-wrapper.single.has-items .ts-control { @apply pr-14; }
+
+/* Tombol hapus pilihan — hanya saat sudah ada yang dipilih */
+.ts-wrapper .clear-button { display: none; }
+.ts-wrapper.has-items .clear-button {
+    @apply text-ink-500 hover:text-rose-600 transition;
+    display: block;
+    right: 1.75rem !important;
+    opacity: 1;
+}
+
+/* Panel dropdown */
+.ts-dropdown {
+    @apply mt-1.5 rounded-xl border border-slate-200 bg-white overflow-hidden z-30;
+    box-shadow: 0 10px 30px -12px rgb(2 32 71 / 0.22), 0 2px 8px -2px rgb(2 32 71 / 0.08);
+}
+.ts-dropdown .ts-dropdown-content {
+    @apply max-h-72;
+}
+.ts-dropdown .option {
+    @apply px-3 py-2 text-sm text-ink-700 cursor-pointer;
+}
+.ts-dropdown .option:hover,
+.ts-dropdown .active {
+    @apply bg-brand-50 text-brand-800;
+}
+.ts-dropdown .option.selected,
+.ts-dropdown .active.selected {
+    @apply bg-brand-500 text-white font-medium;
+}
+.ts-dropdown .no-results {
+    @apply px-3 py-3 text-sm text-ink-500;
+}
+/* Kotak pencarian di dalam dropdown (dropdown_input) */
+.ts-dropdown .dropdown-input-wrap {
+    @apply p-2 border-b border-slate-100;
+}
+.ts-dropdown .dropdown-input {
+    @apply w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+}
+
+/* Multi-select: chip per pilihan */
+.ts-wrapper.multi .ts-control > div {
+    @apply bg-brand-50 text-brand-700 ring-1 ring-brand-200 rounded-lg px-2 py-0.5 text-xs font-medium;
+}
+
+/* Pesan validasi bawaan browser tetap muncul di tempat yang benar */
+.ts-wrapper + select,
+select.tomselected.ts-hidden-accessible {
+    @apply sr-only;
+    display: block !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
 }

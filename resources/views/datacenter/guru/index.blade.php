@@ -16,7 +16,7 @@
 </x-page-header>
 
 <form class="card card-pad mb-4 max-w-md flex gap-2">
-    <input name="q" value="{{ request('q') }}" class="input" placeholder="Cari nama atau NIP...">
+    <input name="q" value="{{ request('q') }}" class="input" placeholder="Cari nama, NIP, atau NUPTK...">
     <button class="btn-secondary"><x-icon name="search" class="w-4 h-4"/></button>
 </form>
 
@@ -47,7 +47,10 @@
             @forelse($items as $g)
                 <tr>
                     <td><input type="checkbox" name="ids[]" value="{{ $g->id }}" x-model="selected"></td>
-                    <td class="font-mono text-xs">{{ $g->nip }}</td>
+                    <td class="font-mono text-xs">
+                        {{ $g->nip }}
+                        @if($g->nuptk)<div class="text-ink-400">NUPTK {{ $g->nuptk }}</div>@endif
+                    </td>
                     <td class="flex items-center gap-2 font-semibold text-ink-900">
                         <x-avatar :src="$g->profile_photo_url" :name="$g->nama_ptk" size="w-8 h-8"/>
                         <div>

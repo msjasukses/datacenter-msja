@@ -140,7 +140,8 @@ class SiswaController extends Controller
 
         return redirect()->route('siswa.import.form')
             ->with('success', "Import selesai: {$result->success} sukses, {$result->failed} gagal.")
-            ->with('importErrors', $result->errors);
+            ->with('importErrors', $result->errors)
+            ->with('importNotes', $result->notes);
     }
 
     public function importTemplate(SiswaExcelService $svc)

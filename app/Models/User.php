@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\HasRbac;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -31,6 +32,15 @@ class User extends Authenticatable
             'otp_enabled' => 'boolean',
             'is_aktif' => 'boolean',
         ];
+    }
+
+    /**
+     * Relasi ke roles (RBAC). Tidak bisa diakses via $user->role karena
+     * nama itu tertutup kolom string `role` ('admin').
+     */
+    public function peran(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function otpCodes(): MorphMany

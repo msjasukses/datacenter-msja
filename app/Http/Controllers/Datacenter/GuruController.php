@@ -13,7 +13,8 @@ class GuruController extends Controller
     {
         $items = Guru::when($r->q, function ($x) use ($r) {
                 $x->where('nama_ptk', 'like', "%{$r->q}%")
-                  ->orWhere('nip', 'like', "%{$r->q}%");
+                  ->orWhere('nip', 'like', "%{$r->q}%")
+                  ->orWhere('nuptk', 'like', "%{$r->q}%");
             })->with('mapel')->orderBy('nama_ptk')->paginate(20)->withQueryString();
         return view('datacenter.guru.index', compact('items'));
     }
@@ -123,12 +124,14 @@ class GuruController extends Controller
     {
         return $r->validate([
             'nip' => 'required|string|max:30|unique:guru,nip,'.$id,
+            'nuptk' => 'nullable|string|max:30',
             'nama_ptk' => 'required|string|max:255',
             'email' => 'nullable|email|max:100',
             'nomor_hp' => 'nullable|string|max:20',
             'jenis_kelamin' => 'nullable|in:L,P',
             'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string|max:50',
             'alamat' => 'nullable|string|max:255',
             'jabatan' => 'nullable|string|max:100',
             'status_kepegawaian' => 'nullable|string|max:50',

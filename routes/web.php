@@ -15,6 +15,7 @@ use App\Http\Controllers\Datacenter\TahunAjaranController;
 use App\Http\Controllers\Datacenter\TingkatKelasController;
 use App\Http\Controllers\LogLoginController;
 use App\Http\Controllers\OtpController;
+use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,9 @@ Route::middleware([
         Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
         Route::put('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
 
+        Route::resource('pengguna', PenggunaController::class)->except('show')
+            ->parameters(['pengguna' => 'pengguna']);
+
         Route::resource('tahun-ajaran', TahunAjaranController::class)
             ->except('show')->parameters(['tahun-ajaran' => 'tahunAjaran']);
         Route::resource('jurusan', JurusanController::class)->except('show');
@@ -91,6 +95,7 @@ Route::middleware([
         Route::post('/guru-mapel/import',         [GuruMapelController::class, 'importStore'])->name('guru-mapel.import.store');
         Route::get('/guru-mapel/import-template', [GuruMapelController::class, 'importTemplate'])->name('guru-mapel.import.template');
         Route::get('/guru-mapel/export/excel',    [GuruMapelController::class, 'exportExcel'])->name('guru-mapel.export.excel');
+        Route::delete('/guru-mapel/bulk-destroy', [GuruMapelController::class, 'bulkDestroy'])->name('guru-mapel.bulk-destroy');
         Route::resource('guru-mapel', GuruMapelController::class)
             ->except('show')->parameters(['guru-mapel' => 'guruMapel']);
 

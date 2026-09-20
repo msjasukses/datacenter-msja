@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@fontsource/inter": "^5.2.8",
-        "@fontsource/plus-jakarta-sans": "^5.2.8"
+        "@fontsource/plus-jakarta-sans": "^5.2.8",
+        "tom-select": "^2.6.2"
     }
 }

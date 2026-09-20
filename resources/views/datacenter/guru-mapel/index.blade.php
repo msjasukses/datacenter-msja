@@ -28,33 +28,59 @@
     <button class="btn-secondary"><x-icon name="search" class="w-4 h-4"/></button>
 </form>
 
-<div class="card overflow-x-auto">
-    <table class="table-modern">
-        <thead><tr>
-            <th>Guru</th><th>Mata Pelajaran</th><th>Tingkat</th><th>Rombel</th><th>Tahun Ajaran</th><th></th>
-        </tr></thead>
-        <tbody>
-        @forelse($items as $gm)
-            <tr>
-                <td class="font-semibold text-ink-900">{{ optional($gm->guru)->nama_ptk ?? '-' }}
-                    <div class="text-[10px] text-ink-500 font-mono">{{ optional($gm->guru)->nip }}</div>
-                </td>
-                <td>{{ optional($gm->mapel)->nama_mapel ?? '-' }}</td>
-                <td class="text-center">{{ optional($gm->rombel)->tingkat ?? '-' }}</td>
-                <td><span class="badge-info">{{ optional($gm->rombel)->nama_rombel ?? '-' }}</span></td>
-                <td class="text-xs">{{ optional($gm->tahunAjaran)->nama_tahun_ajaran ?? '-' }}</td>
-                <td class="text-right">
-                    <a href="{{ route('guru-mapel.edit', $gm) }}" class="btn-ghost p-2"><x-icon name="edit"/></a>
-                    <form method="POST" action="{{ route('guru-mapel.destroy', $gm) }}" class="inline" onsubmit="return confirm('Hapus Data?')">
-                        @csrf @method('DELETE')<button class="btn-ghost p-2 text-rose-600"><x-icon name="trash"/></button>
-                    </form>
-                </td>
-            </tr>
-        @empty
-            <tr><td colspan="6" class="text-center py-8 text-ink-500">Belum ada Data.</td></tr>
-        @endforelse
-        </tbody>
-    </table>
-</div>
+<form method="POST" action="{{ route('guru-mapel.bulk-destroy') }}"
+      x-data="{ selected: [], ids: @js($items->pluck('id')->map(fn ($id) => (string) $id)) }"
+      @submit="if (!confirm(`Hapus ${selected.length} data guru mapel terpilih? Tindakan ini tidak bisa dibatalkan.`)) $event.preventDefault()">
+    @csrf
+    @method('DELETE')
+
+    <div class="card card-pad mb-3 flex items-center justify-between bg-rose-50/60" x-show="selected.length > 0" x-cloak>
+        <span class="text-sm font-medium text-rose-700" x-text="selected.length + ' data dipilih'"></span>
+        <button type="submit" class="btn-danger">
+            <x-icon name="trash" class="w-4 h-4"/> Hapus Terpilih
+        </button>
+    </div>
+
+    <div class="card overflow-x-auto">
+        <table class="table-modern">
+            <thead><tr>
+                <th class="w-10">
+                    <input type="checkbox"
+                           :checked="ids.length > 0 && selected.length === ids.length"
+                           @change="selected = $event.target.checked ? [...ids] : []">
+                </th>
+                <th>Guru</th><th>Mata Pelajaran</th><th>Tingkat</th><th>Rombel</th><th>Tahun Ajaran</th><th></th>
+            </tr></thead>
+            <tbody>
+            @forelse($items as $gm)
+                <tr>
+                    <td><input type="checkbox" name="ids[]" value="{{ $gm->id }}" x-model="selected"></td>
+                    <td class="font-semibold text-ink-900">{{ optional($gm->guru)->nama_ptk ?? '-' }}
+                        <div class="text-[10px] text-ink-500 font-mono">{{ optional($gm->guru)->nip }}</div>
+                    </td>
+                    <td>{{ optional($gm->mapel)->nama_mapel ?? '-' }}</td>
+                    <td class="text-center">{{ optional($gm->rombel)->tingkat ?? '-' }}</td>
+                    <td><span class="badge-info">{{ optional($gm->rombel)->nama_rombel ?? '-' }}</span></td>
+                    <td class="text-xs">{{ optional($gm->tahunAjaran)->nama_tahun_ajaran ?? '-' }}</td>
+                    <td class="text-right whitespace-nowrap">
+                        <a href="{{ route('guru-mapel.edit', $gm) }}" class="btn-ghost p-2"><x-icon name="edit"/></a>
+                        <button type="button" class="btn-ghost p-2 text-rose-600"
+                                onclick="if(confirm('Hapus data ini?')) document.getElementById('destroy-gm-{{ $gm->id }}').submit()">
+                            <x-icon name="trash"/>
+                        </button>
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="7" class="text-center py-8 text-ink-500">Belum ada data.</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div>
+</form>
 <div class="mt-4">{{ $items->links() }}</div>
+
+{{-- Form hapus per-baris terpisah, supaya tidak nested di dalam form bulk di atas --}}
+@foreach($items as $gm)
+    <form id="destroy-gm-{{ $gm->id }}" method="POST" action="{{ route('guru-mapel.destroy', $gm) }}" class="hidden">@csrf @method('DELETE')</form>
+@endforeach
 @endsection
