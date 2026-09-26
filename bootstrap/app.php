@@ -15,11 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware global yang berjalan pada setiap request
         $middleware->append(\App\Http\Middleware\UpdateUserLastSeen::class);
 
-        // Tambahkan license check ke web group (semua halaman web)
-        $middleware->web(append: [
-            \App\Http\Middleware\CheckAppExpiry::class,
-        ]);
-
         // Rate limit standar untuk semua request API (routes/api.php)
         $middleware->throttleApi();
 
@@ -30,7 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'otp'            => \App\Http\Middleware\OtpVerification::class,
             'accountstatus'  => \App\Http\Middleware\AccountStatus::class,
             'admin'          => \App\Http\Middleware\AdminMiddleware::class,
-            'license'        => \App\Http\Middleware\CheckAppExpiry::class,
             'sso'            => \App\Http\Middleware\SingleSessionGuard::class,
             // Sanctum token ability check, dipakai routes/api.php (mis. auth:sanctum + abilities:datacenter.read)
             'abilities'      => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
