@@ -66,6 +66,19 @@ class RombelController extends Controller
         return back()->with('success', 'Rombel dihapus.');
     }
 
+    public function bulkDestroy(Request $r)
+    {
+        $data = $r->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:rombongan_belajar,id',
+        ]);
+
+        $count = RombonganBelajar::whereIn('id', $data['ids'])->count();
+        RombonganBelajar::whereIn('id', $data['ids'])->delete();
+
+        return back()->with('success', "{$count} rombel dihapus.");
+    }
+
     protected function v(Request $r): array
     {
         return $r->validate([

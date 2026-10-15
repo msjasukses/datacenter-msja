@@ -77,6 +77,7 @@ Route::middleware([
         Route::post('/rombel/import',         [RombelController::class, 'importStore'])->name('rombel.import.store');
         Route::get('/rombel/import-template', [RombelController::class, 'importTemplate'])->name('rombel.import.template');
         Route::get('/rombel/export/excel',    [RombelController::class, 'exportExcel'])->name('rombel.export.excel');
+        Route::delete('/rombel/bulk-destroy', [RombelController::class, 'bulkDestroy'])->name('rombel.bulk-destroy');
         Route::resource('rombel', RombelController::class)->except('show')
             ->parameters(['rombel' => 'rombel']);
 
