@@ -68,7 +68,7 @@
                     <x-icon name="user-tie" class="w-4 h-4"/> Data Guru
                 </a>
                 <a href="{{ route('guru-mapel.index') }}" class="sidebar-link {{ request()->routeIs('guru-mapel.*') ? 'active' : '' }}">
-                    <x-icon name="bookmark" class="w-4 h-4"/> Guru Mapel
+                    <x-icon name="bookmark" class="w-4 h-4"/> Penugasan Guru Mapel
                 </a>
             </div>
         </div>

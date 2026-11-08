@@ -1,9 +1,9 @@
 @extends('layouts.app')
-@section('title', 'Import Guru Mapel')
-@section('breadcrumb', 'Data Center / Guru Mapel / Import')
+@section('title', 'Import Penugasan Guru Mapel')
+@section('breadcrumb', 'Data Center / Penugasan Guru Mapel / Import')
 
 @section('content')
-<x-page-header title="Import Data Guru Mapel" subtitle="Upload rekap pembelajaran Dapodik atau template import untuk mengisi guru ↔ mapel ↔ rombel massal">
+<x-page-header title="Import Penugasan Guru Mapel" subtitle="Upload rekap pembelajaran Dapodik atau template import untuk mengisi guru ↔ mapel ↔ rombel massal">
     <x-slot:action>
         <a href="{{ route('guru-mapel.index') }}" class="btn-secondary">Kembali</a>
     </x-slot:action>
