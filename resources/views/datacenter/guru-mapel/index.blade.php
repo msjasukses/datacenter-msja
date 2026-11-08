@@ -126,8 +126,11 @@
         $allPairs = [];
         $rowPairs = [];
         $colPairs = [];
+        $teksMapel = [];
         foreach ($mapelList as $m) {
             $rowPairs[$m->id] = [];
+            // Dipakai kotak pencarian: cocokkan kode maupun nama mapel.
+            $teksMapel[$m->id] = mb_strtolower(trim($m->kode_mapel.' '.$m->nama_mapel));
             foreach ($rombelFlat as $rb) {
                 $pair = $m->id.'-'.$rb->id;
                 $allPairs[] = $pair;
@@ -144,6 +147,15 @@
               all: @js($allPairs),
               rows: @js($rowPairs),
               cols: @js($colPairs),
+              cari: '',
+              teks: @js($teksMapel),
+              mapels: @js($mapelList->pluck('id')),
+              cocok(id) {
+                  const q = this.cari.trim().toLowerCase()
+                  return ! q || (this.teks[id] || '').includes(q)
+              },
+              get tampil() { return this.mapels.filter(id => this.cocok(id)) },
+              get pasanganTampil() { return this.tampil.flatMap(id => this.rows[id]) },
               groupOn(list) { return list.length > 0 && list.every(p => this.sel.includes(p)) },
               toggleGroup(list) {
                   this.sel = this.groupOn(list)
@@ -167,9 +179,30 @@
                     Kosong semua = guru belum ditugaskan.
                 </p>
             </div>
+        </div>
+
+        {{-- Toolbar: cari mapel + aksi massal --}}
+        <div class="px-6 py-3 border-b border-slate-100 bg-slate-50/60 flex flex-wrap items-center justify-between gap-3">
+            <div class="relative grow sm:grow-0 sm:w-72">
+                <span class="absolute inset-y-0 left-3 flex items-center text-ink-400 pointer-events-none">
+                    <x-icon name="search" class="w-4 h-4"/>
+                </span>
+                {{-- type=text, bukan search: ikon silang bawaan browser dobel dengan tombol di bawah --}}
+                <input type="text" x-model="cari" placeholder="Cari mata pelajaran…"
+                       class="input pl-9 pr-9 w-full" aria-label="Cari mata pelajaran">
+                <button type="button" x-show="cari" x-cloak @click="cari = ''"
+                        class="absolute inset-y-0 right-3 flex items-center text-lg leading-none text-ink-400 hover:text-ink-700"
+                        aria-label="Hapus pencarian">&times;</button>
+            </div>
             <div class="flex items-center gap-2">
-                <button type="button" class="btn-secondary" @click="sel = [...all]">Centang semua</button>
-                <button type="button" class="btn-secondary" @click="sel = []">Kosongkan</button>
+                <button type="button" class="btn-secondary" @click="sel = [...new Set([...sel, ...pasanganTampil])]"
+                        :title="cari ? 'Centang semua mapel yang sedang tampil' : 'Centang semua mapel'">
+                    <x-icon name="check" class="w-4 h-4"/> Centang semua
+                </button>
+                <button type="button" class="btn-secondary" @click="sel = sel.filter(p => ! pasanganTampil.includes(p))"
+                        :title="cari ? 'Kosongkan mapel yang sedang tampil' : 'Kosongkan semua'">
+                    <x-icon name="trash" class="w-4 h-4"/> Kosongkan
+                </button>
             </div>
         </div>
 
@@ -206,7 +239,7 @@
                 </thead>
                 <tbody>
                 @foreach($mapelList as $m)
-                    <tr class="hover:bg-brand-50/40">
+                    <tr class="hover:bg-brand-50/40" x-show="cocok({{ $m->id }})">
                         <td class="sticky left-0 z-10 bg-white px-4 py-3 border-b border-r border-slate-200 whitespace-nowrap">
                             <label class="flex items-center gap-2 cursor-pointer"
                                    title="Centang / kosongkan seluruh baris {{ $m->nama_mapel }}">
@@ -227,6 +260,11 @@
                         @endforeach
                     </tr>
                 @endforeach
+                <tr x-show="tampil.length === 0" x-cloak>
+                    <td colspan="{{ 1 + $rombelFlat->count() }}" class="px-4 py-8 text-center text-ink-500">
+                        Tidak ada mata pelajaran yang cocok dengan “<span x-text="cari"></span>”.
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -235,6 +273,9 @@
             <p class="text-sm text-ink-600">
                 <span class="font-semibold text-ink-900" x-text="sel.length"></span> penugasan dicentang
                 dari {{ count($allPairs) }} kemungkinan · TA {{ $ta->nama_tahun_ajaran }}
+                <span class="badge-muted ml-2" x-show="cari" x-cloak>
+                    <span x-text="tampil.length"></span> dari {{ $mapelList->count() }} mapel tampil
+                </span>
                 <span class="badge-warning ml-2" x-show="berubah" x-cloak>Belum disimpan</span>
             </p>
             <div class="flex items-center gap-2">
