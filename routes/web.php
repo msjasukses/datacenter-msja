@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Datacenter\GuruController;
 use App\Http\Controllers\Datacenter\GuruMapelController;
 use App\Http\Controllers\Datacenter\JurusanController;
+use App\Http\Controllers\Datacenter\KelasMovingController;
 use App\Http\Controllers\Datacenter\MataPelajaranController;
 use App\Http\Controllers\Datacenter\PengaturanController;
 use App\Http\Controllers\Datacenter\PeriodikalController;
@@ -98,6 +99,19 @@ Route::middleware([
         Route::get('/guru-mapel/export/excel',    [GuruMapelController::class, 'exportExcel'])->name('guru-mapel.export.excel');
         Route::post('/guru-mapel/penugasan',      [GuruMapelController::class, 'penugasanStore'])->name('guru-mapel.penugasan.store');
         Route::get('/guru-mapel',                 [GuruMapelController::class, 'index'])->name('guru-mapel.index');
+
+        // Kelas Moving — kelas per mapel yang anggotanya diambil dari Data Siswa.
+        Route::get('/kelas-moving/import',          [KelasMovingController::class, 'importForm'])->name('kelas-moving.import.form');
+        Route::post('/kelas-moving/import',         [KelasMovingController::class, 'importStore'])->name('kelas-moving.import.store');
+        Route::get('/kelas-moving/import-template', [KelasMovingController::class, 'importTemplate'])->name('kelas-moving.import.template');
+        Route::get('/kelas-moving/export/excel',    [KelasMovingController::class, 'exportExcel'])->name('kelas-moving.export.excel');
+        Route::delete('/kelas-moving/bulk-destroy', [KelasMovingController::class, 'bulkDestroy'])->name('kelas-moving.bulk-destroy');
+        Route::get('/kelas-moving/{kelasMoving}/anggota',  [KelasMovingController::class, 'anggota'])->name('kelas-moving.anggota');
+        Route::get('/kelas-moving/{kelasMoving}/anggota/template', [KelasMovingController::class, 'anggotaTemplate'])->name('kelas-moving.anggota.template');
+        Route::post('/kelas-moving/{kelasMoving}/anggota/import',   [KelasMovingController::class, 'anggotaImport'])->name('kelas-moving.anggota.import');
+        Route::post('/kelas-moving/{kelasMoving}/anggota', [KelasMovingController::class, 'anggotaStore'])->name('kelas-moving.anggota.store');
+        Route::resource('kelas-moving', KelasMovingController::class)->except('show')
+            ->parameters(['kelas-moving' => 'kelasMoving']);
 
         Route::get('/siswa/import',          [SiswaController::class, 'importForm'])->name('siswa.import.form');
         Route::post('/siswa/import',         [SiswaController::class, 'importStore'])->name('siswa.import.store');

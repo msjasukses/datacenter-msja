@@ -65,4 +65,17 @@ class Siswa extends Authenticatable
     {
         return $this->hasMany(QuizAttempt::class);
     }
+
+    /** Kelas moving (kelas per mata pelajaran) yang diikuti siswa ini. */
+    public function kelasMoving()
+    {
+        return $this->belongsToMany(KelasMoving::class, 'kelas_moving_siswa', 'siswa_id', 'kelas_moving_id')
+            ->withTimestamps();
+    }
+
+    /** Kelas moving pada tahun ajaran yang sedang aktif. */
+    public function kelasMovingAktif()
+    {
+        return $this->kelasMoving()->whereHas('tahunAjaran', fn ($q) => $q->where('is_aktif', true));
+    }
 }

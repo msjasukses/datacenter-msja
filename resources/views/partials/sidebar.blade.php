@@ -78,6 +78,11 @@
             <x-icon name="users"/> Data Siswa
         </a>
 
+        {{-- Kelas Moving — kelas per mapel, anggotanya diambil dari Data Siswa --}}
+        <a href="{{ route('kelas-moving.index') }}" class="sidebar-link {{ request()->routeIs('kelas-moving.*') ? 'active' : '' }}">
+            <x-icon name="refresh"/> Kelas Moving
+        </a>
+
         {{-- Administrasi Periodikal --}}
         <div x-data="{ open: @js($grpPeriodikal) }">
             <button type="button" @click="open = !open" class="sidebar-link sidebar-toggle w-full {{ $grpPeriodikal ? 'text-white' : '' }}">
