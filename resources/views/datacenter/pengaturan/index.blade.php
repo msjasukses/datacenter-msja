@@ -11,6 +11,7 @@
         @foreach([
             'identitas' => ' Identitas Sekolah',
             'logo'      => ' Logo Sekolah',
+            'ttd'       => ' TTD Kepala Sekolah',
             'login'     => ' Halaman Login',
             'aplikasi'  => ' Identitas Aplikasi',
         ] as $key => $label)
@@ -22,7 +23,8 @@
         @endforeach
     </div>
 
-    <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data" class="space-y-6">
+    <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data" class="space-y-6"
+          @reset="$dispatch('ttd-reset')">
         @csrf @method('PUT')
 
         {{-- ============ TAB IDENTITAS SEKOLAH ============ --}}
@@ -68,6 +70,47 @@
                         <label class="inline-flex items-center gap-2 text-xs text-rose-600 mt-2">
                             <input type="checkbox" name="remove_logo" value="1" class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
                             Hapus logo saat ini
+                        </label>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- ============ TAB TTD KEPALA SEKOLAH ============ --}}
+        <div x-show="tab==='ttd'" x-cloak class="card card-pad space-y-4"
+             x-data="{ preview: null }" @ttd-reset.window="preview = null">
+            <h3 class="font-semibold text-ink-900">Tanda Tangan Kepala Sekolah</h3>
+            <p class="text-xs text-ink-500">
+                Gambar tanda tangan untuk dokumen/cetakan resmi sekolah. Format: PNG/JPG/WEBP, max 2MB.
+                Disarankan PNG dengan latar transparan.
+            </p>
+
+            <div class="flex flex-wrap items-start gap-4">
+                <div class="w-56 shrink-0 text-center">
+                    <div class="h-28 rounded-xl border border-slate-200 bg-white grid place-items-center overflow-hidden p-2">
+                        <template x-if="preview">
+                            <img :src="preview" alt="Preview TTD" class="max-w-full max-h-full object-contain">
+                        </template>
+                        <template x-if="!preview">
+                            @if($sekolah->ttd_kepala_sekolah)
+                                <img src="{{ $sekolah->ttd_kepala_sekolah_url }}" alt="TTD Kepala Sekolah" class="max-w-full max-h-full object-contain">
+                            @else
+                                <span class="text-xs text-slate-400">Belum ada tanda tangan</span>
+                            @endif
+                        </template>
+                    </div>
+                    <p class="mt-2 text-sm font-semibold text-ink-900 underline underline-offset-2">{{ $sekolah->kepala_sekolah ?: 'Nama Kepala Sekolah' }}</p>
+                    <p class="text-xs text-ink-500">NIP. {{ $sekolah->nip_kepala_sekolah ?: '-' }}</p>
+                </div>
+                <div class="flex-1 min-w-[220px]">
+                    <input type="file" name="ttd_kepala_sekolah" accept="image/png,image/jpeg,image/webp"
+                           @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                           class="input file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-brand-50 file:text-brand-700 file:font-semibold">
+                    @error('ttd_kepala_sekolah')<p class="text-xs text-rose-600 mt-1">{{ $message }}</p>@enderror
+                    @if($sekolah->ttd_kepala_sekolah)
+                        <label class="inline-flex items-center gap-2 text-xs text-rose-600 mt-2">
+                            <input type="checkbox" name="remove_ttd_kepala_sekolah" value="1" class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                            Hapus tanda tangan saat ini
                         </label>
                     @endif
                 </div>

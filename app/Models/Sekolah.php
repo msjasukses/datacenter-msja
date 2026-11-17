@@ -15,4 +15,11 @@ class Sekolah extends Model
             ? asset('storage/'.$this->logo)
             : asset('img/logo-default.svg');
     }
+
+    public function getTtdKepalaSekolahUrlAttribute(): ?string
+    {
+        return $this->ttd_kepala_sekolah
+            ? asset('storage/'.$this->ttd_kepala_sekolah)
+            : null;
+    }
 }

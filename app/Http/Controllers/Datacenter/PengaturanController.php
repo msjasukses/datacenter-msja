@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Pengaturan Aplikasi — satu halaman ber-tab (Identitas Sekolah, Logo Sekolah,
- * Halaman Login, Identitas Aplikasi) menggantikan menu Profil Sekolah &
+ * TTD Kepala Sekolah, Halaman Login, Identitas Aplikasi) menggantikan menu Profil Sekolah &
  * Halaman Login yang tadinya terpisah di sidebar.
  *
  * Identitas Sekolah, Logo, dan Background Halaman Login yang diatur di sini
@@ -59,6 +59,7 @@ class PengaturanController extends Controller
 
         $request->validate([
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+            'ttd_kepala_sekolah' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'login_bg' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
             'app_name' => 'nullable|string|max:255',
             'app_tagline' => 'nullable|string|max:255',
@@ -81,6 +82,19 @@ class PengaturanController extends Controller
                 Storage::disk('public')->delete($sekolah->logo);
             }
             $sekolahData['logo'] = null;
+        }
+
+        // ---- Tanda tangan kepala sekolah ----
+        if ($request->hasFile('ttd_kepala_sekolah')) {
+            if ($sekolah && $sekolah->ttd_kepala_sekolah) {
+                Storage::disk('public')->delete($sekolah->ttd_kepala_sekolah);
+            }
+            $sekolahData['ttd_kepala_sekolah'] = $request->file('ttd_kepala_sekolah')->store('sekolah/ttd', 'public');
+        } elseif ($request->boolean('remove_ttd_kepala_sekolah')) {
+            if ($sekolah && $sekolah->ttd_kepala_sekolah) {
+                Storage::disk('public')->delete($sekolah->ttd_kepala_sekolah);
+            }
+            $sekolahData['ttd_kepala_sekolah'] = null;
         }
 
         if ($sekolah) {
