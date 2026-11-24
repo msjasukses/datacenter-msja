@@ -83,6 +83,11 @@
             <x-icon name="refresh"/> Kelas Moving
         </a>
 
+        {{-- Upload Foto Siswa & Guru --}}
+        <a href="{{ route('foto.index') }}" class="sidebar-link {{ request()->routeIs('foto.*') ? 'active' : '' }}">
+            <x-icon name="camera"/> Upload Foto
+        </a>
+
         {{-- Administrasi Periodikal --}}
         <div x-data="{ open: @js($grpPeriodikal) }">
             <button type="button" @click="open = !open" class="sidebar-link sidebar-toggle w-full {{ $grpPeriodikal ? 'text-white' : '' }}">

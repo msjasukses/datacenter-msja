@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountStatusController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Datacenter\FotoController;
 use App\Http\Controllers\Datacenter\GuruController;
 use App\Http\Controllers\Datacenter\GuruMapelController;
 use App\Http\Controllers\Datacenter\JurusanController;
@@ -120,6 +121,12 @@ Route::middleware([
         Route::delete('/siswa/bulk-destroy', [SiswaController::class, 'bulkDestroy'])->name('siswa.bulk-destroy');
         Route::resource('siswa', SiswaController::class)->except('show');
         Route::post('/siswa/{siswa}/unlock', [SiswaController::class, 'unlock'])->name('siswa.unlock');
+
+        // Upload Foto Siswa & Guru — satuan (per kartu) maupun massal (banyak file / ZIP).
+        Route::get('/foto', [FotoController::class, 'index'])->name('foto.index');
+        Route::post('/foto/{tipe}/massal', [FotoController::class, 'massal'])->whereIn('tipe', ['siswa', 'guru'])->name('foto.massal');
+        Route::post('/foto/{tipe}/{id}', [FotoController::class, 'upload'])->whereIn('tipe', ['siswa', 'guru'])->whereNumber('id')->name('foto.upload');
+        Route::delete('/foto/{tipe}/{id}', [FotoController::class, 'destroy'])->whereIn('tipe', ['siswa', 'guru'])->whereNumber('id')->name('foto.destroy');
 
         Route::prefix('periodikal')->name('periodikal.')->group(function () {
             Route::get('/semua',               [PeriodikalController::class, 'semuaForm'])->name('semua.form');
